@@ -3,8 +3,6 @@ package mainStuff;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import mainStuff.ClientSocket;
-
 public class SocketReceiver implements Runnable{
 	private DataInputStream in_ = null;
 	

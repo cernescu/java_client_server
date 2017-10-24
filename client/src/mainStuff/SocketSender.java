@@ -20,10 +20,10 @@ public class SocketSender implements Runnable{
 				System.out.print("Client: ");
 				fromUser = readFromUser.readLine();
 	            if (fromUser != null) {
-	                out_.writeUTF(fromUser);
-	                if (fromUser.equals("done")) {
+	            	if (fromUser.equals("done")) {
 		            	break;
 		            }
+	                out_.writeUTF(fromUser);
 	            }
 			}
 		} catch (IOException e) {
