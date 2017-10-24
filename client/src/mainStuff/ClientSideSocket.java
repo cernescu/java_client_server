@@ -5,7 +5,7 @@ import java.net.*;
 
 public class ClientSideSocket implements Runnable{
 
-	private static String DEFAULT_HOST = "localhost";
+	private static String DEFAULT_HOST = "localhost";//"192.168.0.169";
 	private static int DEFAULT_PORT = 8031;
 	private static String DEFAULT_HANDSHAKE = "hello";
 	
@@ -30,6 +30,7 @@ public class ClientSideSocket implements Runnable{
 	{
 	    try {
 	    	socket_ = new Socket(host_, port_);
+	    	System.out.println("Connected to: " + socket_.toString());
 	    } catch (UnknownHostException e) {
 	        System.err.println("Don't know about host " + host_);
 	        System.exit(1);
@@ -56,25 +57,33 @@ public class ClientSideSocket implements Runnable{
 		createIOStreams();
 	}
 	
-	private void start() {
+	private void startReceiving() {
 		String fromServer;
+		String fromUser = "Handshake acknowledged!";
+		
 		try {
 			while ((fromServer = in_.readUTF()) != null) {
 				System.err.println("Received from server: " + fromServer);
 				if ( fromServer.equals(DEFAULT_HANDSHAKE)) {
 					System.err.println("Received handshake from server!");
+					out_.writeUTF(fromUser);
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Received badly formatted data from server!");
+			System.err.println("Exception in communication!");
 	        System.exit(1);
 		}
 	}
+	
+	private void startSending() {
+		
+	}
 
-@Override
-public void run() {
-	setup();
-	start();
-	// TODO Auto-generated method stub
-}
+	@Override
+	public void run() {
+		setup();
+		startReceiving();
+		startSending();
+		// TODO Auto-generated method stub
+	}
 }
