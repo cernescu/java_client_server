@@ -4,17 +4,23 @@ import java.io.*;
 import java.net.*;
 
 public class ClientRunner {
-
 	public static void main(String[] args) {
+		String hostName;
+        int portNumber;
+        
 		if (args.length != 2) {
             System.err.println(
                 "Usage: java EchoClient <host name> <port number>");
-            System.exit(1);
+            System.out.println("Setting default values to tmlina82, 3128");
+             hostName = "tmlina82";
+	         portNumber = 3128;
+            //System.exit(1);
         }
-
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
-
+		else {
+	        hostName = args[0];
+	        portNumber = Integer.parseInt(args[1]);
+		}
+		
         try (
             Socket kkSocket = new Socket(hostName, portNumber);
             PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
@@ -46,5 +52,4 @@ public class ClientRunner {
             System.exit(1);
         }
 	}
-
 }
