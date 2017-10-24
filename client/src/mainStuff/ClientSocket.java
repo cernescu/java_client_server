@@ -3,11 +3,9 @@ package mainStuff;
 import java.io.*;
 import java.net.*;
 
-public class ClientSideSocket implements Runnable{
-
+public class ClientSocket {
 	private static String DEFAULT_HOST = "localhost";//"192.168.0.169";
 	private static int DEFAULT_PORT = 8031;
-	private static String DEFAULT_HANDSHAKE = "hello";
 	
 	private String host_;
 	private int port_;
@@ -17,13 +15,10 @@ public class ClientSideSocket implements Runnable{
 	
 	private Socket socket_ = null;
 	
-	public ClientSideSocket(String[] args) {
-		if (args.length != 1)
-		{
-			System.err.println("Running with no arguments. Assuming default hostName and Port!");
+	public ClientSocket(/*String host, int port*/) {
+			//System.err.println("Running with no arguments. Assuming default hostName and Port!");
 			host_ = DEFAULT_HOST;
 			port_ = DEFAULT_PORT;
-		}
 	}
 	
 	private void createSocket()
@@ -57,33 +52,16 @@ public class ClientSideSocket implements Runnable{
 		createIOStreams();
 	}
 	
-	private void startReceiving() {
-		String fromServer;
-		String fromUser = "Handshake acknowledged!";
-		
-		try {
-			while ((fromServer = in_.readUTF()) != null) {
-				System.err.println("Received from server: " + fromServer);
-				if ( fromServer.equals(DEFAULT_HANDSHAKE)) {
-					System.err.println("Received handshake from server!");
-					out_.writeUTF(fromUser);
-				}
-			}
-		} catch (IOException e) {
-			System.err.println("Exception in communication!");
-	        System.exit(1);
-		}
-	}
-	
-	private void startSending() {
-		
-	}
-
-	@Override
 	public void run() {
 		setup();
-		startReceiving();
-		startSending();
+		SocketSender sender = new SocketSender(out_);
+		SocketReceiver receiver = new SocketReceiver(in_);
+		
+		Thread senderThread = new Thread(sender);
+		senderThread.start();
+		
+		Thread receiverThread = new Thread(receiver);
+		receiverThread.start();
 		// TODO Auto-generated method stub
 	}
 }

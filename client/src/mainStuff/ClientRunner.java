@@ -1,12 +1,12 @@
 package mainStuff;
 
-import mainStuff.ClientSideSocket;
+import mainStuff.ClientSocket;
 
 public class ClientRunner {
-	private static ClientSideSocket client = null;
+	private static ClientSocket client = null;
 	
 	public static void main(String[] args) {
-		client = new ClientSideSocket(args);
+		client = new ClientSocket();
 		client.run();
 	}
 }
