@@ -11,8 +11,8 @@ public class ClientRunner {
 		if (args.length != 2) {
             System.err.println(
                 "Usage: java EchoClient <host name> <port number>");
-            System.out.println("Setting default values to tmlina82, 3128");
-             hostName = "tmlina82";
+            System.out.println("Setting default values to tmlina77, 3128");
+             hostName = "tmlina77";
 	         portNumber = 3128;
             //System.exit(1);
         }
