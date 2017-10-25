@@ -4,8 +4,8 @@ import java.io.*;
 import java.net.*;
 
 public class ClientSocket {
-	private static String DEFAULT_HOST = "localhost";//"192.168.0.169";
-	private static int DEFAULT_PORT = 8031;
+	private static final String DEFAULT_HOST = "tmlina91";//"192.168.0.169";
+	private static final int DEFAULT_PORT = 8031;
 	
 	private String host_;
 	private int port_;
