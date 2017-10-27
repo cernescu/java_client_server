@@ -32,7 +32,7 @@ public class ServerDataStreamsManager implements Runnable {
 					toClient.writeUTF(fromClientMessage);
 			}
 		} catch (IOException e) {
-			System.err.println("Usage: message from client error...");
+			System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
 			System.err.println("StackTrace:");
 			e.printStackTrace();
 		}

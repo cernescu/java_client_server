@@ -11,10 +11,14 @@ public class ServerAuthManager {
 	
 	public enum AuthState {
 		
+		//TODO encryption for passwords
+		//TODO key or something related to check users
+		
 		USER_CONNECTED {
 			@Override
 			AuthState authProcess(String... args ){
-			
+				System.out.println("Usage: authentication process started...");
+				
 				return AuthState.PROMPT_FOR_USERNAME;
 				}
 		},
@@ -22,7 +26,27 @@ public class ServerAuthManager {
 		PROMPT_FOR_USERNAME{
 			@Override
 			AuthState authProcess(String... args){
-			
+				System.out.println("Usage: user prompted for username...");
+				
+				try {
+					toClient.writeUTF("Please enter your username:");
+				} catch (IOException e) {
+					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
+					System.err.println("StackTrace:");
+					e.printStackTrace();
+				}
+				
+				try {
+					//TODO regex to check username consistency
+					//TODO username global var
+					String username = fromClient.readUTF();
+					System.out.println(username);
+				} catch (IOException e) {
+					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
+					System.err.println("StackTrace:");
+					e.printStackTrace();
+				}
+				
 				return AuthState.CHECK_USERNAME;
 				}
 		},
@@ -30,16 +54,39 @@ public class ServerAuthManager {
 		CHECK_USERNAME{
 			@Override
 			AuthState authProcess(String... args){
+				System.out.println("Usage: username is being checked...");
+				System.out.println("Usage: please wait...");
 				
-				return AuthState.CHECK_USERNAME;
+				//TODO check if username exists in database
+				
+				return AuthState.PROMPT_FOR_PASSWORD;
 				}
 			},
 			
 		PROMPT_FOR_PASSWORD{
 			@Override
 			AuthState authProcess(String... args){
+				System.out.println("Usage: user prompted for password...");	
+							
+				try {
+					toClient.writeUTF("Please enter your password:");
+				} catch (IOException e) {
+					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
+					System.err.println("StackTrace:");
+					e.printStackTrace();
+				}
 				
-				return AuthState.CHECK_USERNAME;
+				try {
+					//TODO password saved in global var to be checked in the next state
+					String password = fromClient.readUTF();
+					System.out.println(password);
+				} catch (IOException e) {
+					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
+					System.err.println("StackTrace:");
+					e.printStackTrace();
+				}
+				
+				return AuthState.CHECK_PASSWORD;
 				}
 			},
 			
@@ -47,26 +94,34 @@ public class ServerAuthManager {
 			@Override
 			AuthState authProcess(String... args){
 				
-				return AuthState.CHECK_USERNAME;
+				/*TODO check password stored with the one from
+				 * database that corresponds to stored username
+				 * earlier checked
+				 */
+				
+				//TODO if password not good return AuthState.PROMPT_FOR_PASSWORD
+				
+				System.out.println("Usage: user validated...");
+				System.out.println("Usage: login accepted...");
+				
+				return AuthState.AUTH_SUCCESSFUL;
 				}
 			},
 			
-		AUTH_SUCCESSFULL{
+		AUTH_SUCCESSFUL{
 			@Override
 			AuthState authProcess(String... args){
 				
-				return AuthState.CHECK_USERNAME;
+				return this;
 				}
 			};
 			
 			abstract AuthState authProcess(String... args);
 		}
-		
-
-	
-	Socket socket;
-	DataInputStream fromClient = null;
-	DataOutputStream toClient = null;
+			
+	private Socket socket;
+	private static DataInputStream fromClient = null;
+	private static DataOutputStream toClient = null;
 	
 	private AuthState state;
 	
@@ -76,7 +131,18 @@ public class ServerAuthManager {
 		
 		fromClient = new DataInputStream(socket.getInputStream());
 		toClient = new DataOutputStream(socket.getOutputStream());	
+		
+		state = AuthState.USER_CONNECTED;
+		
+		startAuthProcess();
 				
 		}		
+	
+	private void startAuthProcess(){
+		
+		while(!state.equals(state.AUTH_SUCCESSFUL)){
+			state=state.authProcess();
+		}
+	}
 }
 

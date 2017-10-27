@@ -11,7 +11,6 @@ public class ServerManager implements Runnable {
 	private ArrayList<Socket> sockets;
 	private ServerSocket server = null;
 	private ServerDataStreamsManager serverDataStreams = null;
-	private ServerAuthManager serverAuthentication = null;
 
 	public ServerManager(int port){
 		
@@ -36,8 +35,13 @@ public class ServerManager implements Runnable {
 			try {
 				sockets.add(server.accept());
 				
-				serverAuthentication = new ServerAuthManager(sockets.get(sockets.size()-1));
+				new ServerAuthManager(sockets.get(sockets.size()-1));
 				
+				/*TODO usersmanager to send available users and get only the sockets that
+				 * want to communicate (send message only between 2 sockets at once
+				 */
+				
+				//TODO this has to be removed
 				if(sockets.size() >= 2)
 				{serverDataStreams = new ServerDataStreamsManager(sockets.get(sockets.size()-2),
 						sockets.get(sockets.size()-1));
@@ -47,8 +51,7 @@ public class ServerManager implements Runnable {
 				System.out.println("Client accepted: " + sockets.get(sockets.size()-1));
 				System.out.println("All clients connected: " + sockets.toString());}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("Backend: Acceptance Error... " + e);
+				System.err.println("[" + this.toString() + "]Backend: Acceptance Error... " + e);
 				System.err.println("StackTrace:");
 				e.printStackTrace();
 			}
