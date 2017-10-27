@@ -2,17 +2,15 @@ package serverPackage;
 
 import java.net.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.*;
 
-import serverPackage.ServerInputStream;
+import serverPackage.ServerDataStreams;
 
 public class ServerManager implements Runnable {
 
 	private ArrayList<Socket> sockets;
 	private ServerSocket server = null;
-	public ServerInputStream serverInputStream = null;
-	public ServerOutputStream serverOutputStream = null;
+	public ServerDataStreams serverDataStreams = null;
 
 	public ServerManager(int port){
 		
@@ -36,14 +34,14 @@ public class ServerManager implements Runnable {
 		while(true){
 			try {
 				sockets.add(server.accept());
+				if(sockets.size() >= 2)
+				{serverDataStreams = new ServerDataStreams(sockets.get(sockets.size()-2),
+						sockets.get(sockets.size()-1));
 				
-				serverInputStream = new ServerInputStream(sockets.get(sockets.size()-1));
-				serverOutputStream = new ServerOutputStream(sockets.get(sockets.size()-1));
-				
-				(new Thread(serverInputStream)).start();
-				
+				(new Thread(serverDataStreams)).start();
+
 				System.out.println("Client accepted: " + sockets.get(sockets.size()-1));
-				System.out.println("All clients connected: " + sockets.toString());
+				System.out.println("All clients connected: " + sockets.toString());}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				System.err.println("Backend: Acceptance Error... " + e);
@@ -51,14 +49,5 @@ public class ServerManager implements Runnable {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	//TODO Make pair of client sockets and show message only between them
-	public HashMap<Socket,Socket> getSockets(){
-		
-		HashMap<Socket,Socket> clients = null;
-		clients.put(sockets.get(0), sockets.get(0));
-		
-		return clients;		
 	}
 }
