@@ -1,9 +1,9 @@
-package mainStuff;
+package clientSocket;
 
 import java.io.*;
 import java.net.*;
 
-public class ClientSocket {
+public class ClientSocket implements Runnable {
 	private static final String DEFAULT_HOST = "tmlina91";//"192.168.0.169";
 	private static final int DEFAULT_PORT = 8031;
 	
@@ -15,8 +15,7 @@ public class ClientSocket {
 	
 	private Socket socket_ = null;
 	
-	public ClientSocket(/*String host, int port*/) {
-			//System.err.println("Running with no arguments. Assuming default hostName and Port!");
+	public ClientSocket() {
 			host_ = DEFAULT_HOST;
 			port_ = DEFAULT_PORT;
 	}
@@ -52,7 +51,9 @@ public class ClientSocket {
 		createIOStreams();
 	}
 	
+	@Override
 	public void run() {
+		/*
 		setup();
 		SocketSender sender = new SocketSender(out_);
 		SocketReceiver receiver = new SocketReceiver(in_);
@@ -62,6 +63,8 @@ public class ClientSocket {
 		
 		Thread receiverThread = new Thread(receiver);
 		receiverThread.start();
+		*/
+		System.out.println("Started ClientSocket thread");
 		// TODO Auto-generated method stub
 	}
 }
