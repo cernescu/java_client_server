@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ServerDataStreams implements Runnable {
+public class ServerDataStreamsManager implements Runnable {
 
 	DataInputStream fromClient = null;
 	DataOutputStream toClient = null;
 	Socket inputSocket;
 	Socket outputSocket;
 	
-	public ServerDataStreams(Socket inputSocket,Socket outputSocket) throws IOException{
+	public ServerDataStreamsManager(Socket inputSocket,Socket outputSocket) throws IOException{
 		this.inputSocket=inputSocket;
 		this.outputSocket=outputSocket;
 		

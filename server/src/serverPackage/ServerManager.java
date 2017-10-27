@@ -4,13 +4,14 @@ import java.net.*;
 import java.util.ArrayList;
 import java.io.*;
 
-import serverPackage.ServerDataStreams;
+import serverPackage.ServerDataStreamsManager;
 
 public class ServerManager implements Runnable {
 
 	private ArrayList<Socket> sockets;
 	private ServerSocket server = null;
-	public ServerDataStreams serverDataStreams = null;
+	private ServerDataStreamsManager serverDataStreams = null;
+	private ServerAuthManager serverAuthentication = null;
 
 	public ServerManager(int port){
 		
@@ -34,8 +35,11 @@ public class ServerManager implements Runnable {
 		while(true){
 			try {
 				sockets.add(server.accept());
+				
+				serverAuthentication = new ServerAuthManager(sockets.get(sockets.size()-1));
+				
 				if(sockets.size() >= 2)
-				{serverDataStreams = new ServerDataStreams(sockets.get(sockets.size()-2),
+				{serverDataStreams = new ServerDataStreamsManager(sockets.get(sockets.size()-2),
 						sockets.get(sockets.size()-1));
 				
 				(new Thread(serverDataStreams)).start();
