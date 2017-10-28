@@ -9,6 +9,7 @@ import serverPackage.ServerDataStreamsManager;
 public class ServerManager implements Runnable {
 
 	private ArrayList<Socket> sockets;
+	//TODO make SSLSecureServerSocket
 	private ServerSocket server = null;
 	private ServerDataStreamsManager serverDataStreams = null;
 
@@ -33,12 +34,20 @@ public class ServerManager implements Runnable {
 			System.out.println("Waiting for a client ...");
 		while(true){
 			try {
-				sockets.add(server.accept());
+				//sockets.add(server.accept());
 				
-				new ServerAuthManager(sockets.get(sockets.size()-1));
+				//new ServerAuthManager(sockets.get(sockets.size()-1));
+				new ServerAuthManager(server.accept());
+				
+				
+				sockets.add(server.accept());
 				
 				/*TODO usersmanager to send available users and get only the sockets that
 				 * want to communicate (send message only between 2 sockets at once
+				 */
+				
+				/*TODO create serverDataStreams from usersManager when 1 user(socket) wants
+				 * to chat with another user(socket)
 				 */
 				
 				//TODO this has to be removed

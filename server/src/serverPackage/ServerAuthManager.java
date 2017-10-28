@@ -5,14 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import serverPackage.ServerAuthManager.AuthState;
-
 public class ServerAuthManager {
 	
+	//TODO ServerClientRegistrationsManager
+	
+	private static String username;
+	private static String password;
+	private static int loginAttempts;
+	
 	public enum AuthState {
-		
-		//TODO encryption for passwords
-		//TODO key or something related to check users
 		
 		USER_CONNECTED {
 			@Override
@@ -38,8 +39,7 @@ public class ServerAuthManager {
 				
 				try {
 					//TODO regex to check username consistency
-					//TODO username global var
-					String username = fromClient.readUTF();
+					username = fromClient.readUTF();
 					System.out.println(username);
 				} catch (IOException e) {
 					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
@@ -57,9 +57,14 @@ public class ServerAuthManager {
 				System.out.println("Usage: username is being checked...");
 				System.out.println("Usage: please wait...");
 				
-				//TODO check if username exists in database
+				if(usernameExists(username)){
+					System.out.println("Usage: username accepted...");
+					return AuthState.PROMPT_FOR_PASSWORD;
+				}
+				else
+					System.out.println("Usage: username does not exist...");
 				
-				return AuthState.PROMPT_FOR_PASSWORD;
+				return this;
 				}
 			},
 			
@@ -77,8 +82,7 @@ public class ServerAuthManager {
 				}
 				
 				try {
-					//TODO password saved in global var to be checked in the next state
-					String password = fromClient.readUTF();
+					password = fromClient.readUTF();
 					System.out.println(password);
 				} catch (IOException e) {
 					System.err.println("[" + this.toString() + "]Usage: message sending/receiving error...");
@@ -98,17 +102,49 @@ public class ServerAuthManager {
 				 * database that corresponds to stored username
 				 * earlier checked
 				 */
+				if (isPasswordCorrect(password) && loginAttempts <= 2){
+					loginAttempts = 0;
+					return AuthState.AUTH_SUCCESSFUL;
+				}
+				else
+					if(!isPasswordCorrect(password))
+						loginAttempts++;
 				
-				//TODO if password not good return AuthState.PROMPT_FOR_PASSWORD
+				if(loginAttempts > 2){
+					loginAttempts = 0;
+					return AuthState.AUTH_FAILED;
+					}
 				
-				System.out.println("Usage: user validated...");
-				System.out.println("Usage: login accepted...");
-				
-				return AuthState.AUTH_SUCCESSFUL;
+				return AuthState.PROMPT_FOR_PASSWORD;
 				}
 			},
 			
 		AUTH_SUCCESSFUL{
+			@Override
+			AuthState authProcess(String... args){
+				
+				username = null;
+				password = null;
+				
+				System.out.println("Usage: user validated...");
+				System.out.println("Usage: login accepted...");
+				
+				return AuthState.AUTH_PROCESS_DONE;
+				}
+			},
+		
+		AUTH_FAILED{
+			@Override
+			AuthState authProcess(String... args){
+				
+				username = null;
+				password = null;
+				
+				return AuthState.AUTH_PROCESS_DONE;
+				}
+			},
+		
+		AUTH_PROCESS_DONE{
 			@Override
 			AuthState authProcess(String... args){
 				
@@ -132,6 +168,11 @@ public class ServerAuthManager {
 		fromClient = new DataInputStream(socket.getInputStream());
 		toClient = new DataOutputStream(socket.getOutputStream());	
 		
+		username = null;
+		password = null;
+		
+		loginAttempts = 0;
+		
 		state = AuthState.USER_CONNECTED;
 		
 		startAuthProcess();
@@ -140,9 +181,32 @@ public class ServerAuthManager {
 	
 	private void startAuthProcess(){
 		
-		while(!state.equals(state.AUTH_SUCCESSFUL)){
+		while(!state.equals(AuthState.AUTH_PROCESS_DONE)){
+			
 			state=state.authProcess();
+			
+			if(state.equals(AuthState.AUTH_FAILED)){
+				try {
+			
+					socket.close();
+					state=AuthState.AUTH_PROCESS_DONE;
+				
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
+	
+	private static boolean usernameExists(String username){
+		
+		return true;
+	}
+	
+	private static boolean isPasswordCorrect(String password){
+		
+		return false;
+	}
+	
 }
 
